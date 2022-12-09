@@ -12,14 +12,14 @@ import java.util.*;
  * */
 
 /*Идея: Так как все многоугольники выпуклые, то предполагается,
-* что можно выпустить линию из границы плоскости в сокровище и эта линия
-* пересекает все сломанные стены. Делее делим плоскость на треугольные
-* сегменты такие, что сокровище и две ближайшие точки на границе
-* плоскости(точки из которых исходят линии), далее проверяем
-* количество линий пересекших этот сегмент хотя бы в одной линии,
-* пересечения в одной линии достаточно, так как две точки на границе
-* ближайшее, следовательно любая линия из границы в сокровище,
-* в этом сегменте, пересечет линию ,пересекшую одну из треугольника .*/
+ * что можно выпустить линию из границы плоскости в сокровище и эта линия
+ * пересекает все сломанные стены. Делее делим плоскость на треугольные
+ * сегменты такие, что сокровище и две ближайшие точки на границе
+ * плоскости(точки из которых исходят линии), далее проверяем
+ * количество линий пересекших этот сегмент хотя бы в одной линии,
+ * пересечения в одной линии достаточно, так как две точки на границе
+ * ближайшее, следовательно любая линия из границы в сокровище,
+ * в этом сегменте, пересечет линию ,пересекшую одну из треугольника .*/
 public class Main {
     public static void main(String[] args) throws IOException {
         Scanner in = new Scanner(Path.of("tests.txt"), StandardCharsets.UTF_8);
@@ -34,6 +34,8 @@ public class Main {
         ArrayList<Point> pointsX100 = new ArrayList<>();
         ArrayList<Point> pointsY100 = new ArrayList<>();
         ArrayList<Point> points = new ArrayList<>();
+        Comparator<Point> comparatorPointX = Comparator.comparingDouble(p -> p.getX());
+        Comparator<Point> comparatorPointY = Comparator.comparingDouble(p -> p.getY());
         while (in.hasNextInt()) {
             n = in.nextInt();
 
@@ -50,26 +52,30 @@ public class Main {
                 p2 = getPoint(in, pointsX0, pointsY0, pointsX100, pointsY100);
                 lines[i] = new Line(p1, p2);
             }
-            treasure = new Point(Double.parseDouble(in.next().replaceAll(",", ".")),
-                    Double.parseDouble(in.next().replaceAll(",", ".")));
+            treasure = new Point(Double.parseDouble(in.next()
+                    .replaceAll(",", ".")),
+                    Double.parseDouble(in.next()
+                            .replaceAll(",", ".")));
             points.add(new Point(0, 0));
             if (!pointsX0.isEmpty()) {
-                Collections.sort(pointsX0, Comparator.comparing(Point::getY));
+                pointsX0.sort(comparatorPointX);
                 points.addAll(pointsX0);
             }
             points.add(new Point(0, 100));
             if (!pointsY100.isEmpty()) {
-                Collections.sort(pointsY100, Comparator.comparing(Point::getX));
+                pointsY100.sort(comparatorPointY);
                 points.addAll(pointsY100);
             }
             points.add(new Point(100, 100));
             if (!pointsX100.isEmpty()) {
-                Collections.sort(pointsX100, Comparator.comparing(Point::getY).reversed());
+                comparatorPointX.reversed();
+                pointsX100.sort(comparatorPointX);
                 points.addAll(pointsX100);
             }
             points.add(new Point(100, 0));
             if (!pointsY0.isEmpty()) {
-                Collections.sort(pointsY0, Comparator.comparing(Point::getX).reversed());
+                comparatorPointY.reversed();
+                pointsY0.sort(comparatorPointY);
                 points.addAll(pointsY0);
             }
 
@@ -90,13 +96,15 @@ public class Main {
                 stP = ndP;
                 crossSt = crossNd;
             }
+            out.write("Number of doors = " + (mins + 1));
+            out.write("\n");
             pointsX0.clear();
             pointsX100.clear();
             pointsY0.clear();
             pointsY100.clear();
             points.clear();
-            out.write("Number of doors = " + (mins + 1));
-            out.write("\n");
+            comparatorPointX.reversed();
+            comparatorPointY.reversed();
         }
         out.flush();
     }
@@ -129,7 +137,8 @@ public class Main {
         double prod1 = product(p2, new Line(p1.getStart(), p2.getStart()));
         double prod2 = product(p2, new Line(p1.getEnd(), p2.getStart()));
 
-        if (prod1 * prod2 > 0 || Math.abs(prod1) < eps || Math.abs(prod2) < eps) return false;
+        if (prod1 * prod2 > 0 || Math.abs(prod1) < eps || Math.abs(prod2) < eps)
+            return false;
 
         prod1 = product(p1, new Line(p2.getStart(), p1.getStart()));
         prod2 = product(p1, new Line(p2.getEnd(), p1.getStart()));
