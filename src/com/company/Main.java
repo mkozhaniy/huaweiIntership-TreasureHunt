@@ -28,14 +28,15 @@ public class Main {
         int n;
         Point p1;
         Point p2;
-        Point treasure;
+        double[] treasure;
+
         ArrayList<Point> pointsX0 = new ArrayList<>();
         ArrayList<Point> pointsY0 = new ArrayList<>();
         ArrayList<Point> pointsX100 = new ArrayList<>();
         ArrayList<Point> pointsY100 = new ArrayList<>();
         ArrayList<Point> points = new ArrayList<>();
-        Comparator<Point> comparatorPointX = Comparator.comparingDouble(p -> p.getX());
-        Comparator<Point> comparatorPointY = Comparator.comparingDouble(p -> p.getY());
+        Comparator<Point> comparatorPointX = Comparator.comparingInt(Point::getX);
+        Comparator<Point> comparatorPointY = Comparator.comparingInt(Point::getY);
         while (in.hasNextInt()) {
             n = in.nextInt();
 
@@ -50,12 +51,11 @@ public class Main {
             for (int i = 0; i < n; ++i) {
                 p1 = getPoint(in, pointsX0, pointsY0, pointsX100, pointsY100);
                 p2 = getPoint(in, pointsX0, pointsY0, pointsX100, pointsY100);
-                lines[i] = new Line(p1, p2);
+                lines[i] = new Line(p1.x, p1.y, p2.x, p2.y);
             }
-            treasure = new Point(Double.parseDouble(in.next()
-                    .replaceAll(",", ".")),
-                    Double.parseDouble(in.next()
-                            .replaceAll(",", ".")));
+            treasure = new double[]{Double.parseDouble(in.next()
+                    .replaceAll(",", ".")), Double.parseDouble(in.next()
+                    .replaceAll(",", "."))};
             points.add(new Point(0, 0));
             if (!pointsX0.isEmpty()) {
                 pointsX0.sort(comparatorPointX);
@@ -83,11 +83,11 @@ public class Main {
             int crossSt;
             int crossNd;
             Point stP = pointsX0.get(0);
-            crossSt = numCrosses(new Line(stP, treasure), lines);
+            crossSt = numCrosses(new Line(stP.x, stP.y, treasure[0], treasure[1]), lines);
             for (var ndP : points) {
                 if (Objects.equals(stP, ndP)) continue;
                 else if (Point.equals(stP, ndP)) continue;
-                crossNd = numCrosses(new Line(ndP, treasure), lines);
+                crossNd = numCrosses(new Line(ndP.x, ndP.y, treasure[0], treasure[1]), lines);
                 if (crossNd > crossSt) {
                     if (crossNd < mins) mins = crossNd;
                 } else {
@@ -124,32 +124,11 @@ public class Main {
         return p1;
     }
 
-    public static double product(Line p1, Line p2) {
-        return (p1.getEnd().x - p1.getStart().x) *
-                (p2.getEnd().y - p2.getStart().y) -
-                (p1.getEnd().y - p1.getStart().y) *
-                        (p2.getEnd().x - p2.getStart().x);
-    }
-
-    public static boolean intersect(Line p1, Line p2) {
-        double eps = 0.000001;
-
-        double prod1 = product(p2, new Line(p1.getStart(), p2.getStart()));
-        double prod2 = product(p2, new Line(p1.getEnd(), p2.getStart()));
-
-        if (prod1 * prod2 > 0 || Math.abs(prod1) < eps || Math.abs(prod2) < eps)
-            return false;
-
-        prod1 = product(p1, new Line(p2.getStart(), p1.getStart()));
-        prod2 = product(p1, new Line(p2.getEnd(), p1.getStart()));
-
-        return !(prod1 * prod2 > 0 || Math.abs(prod1) < eps || Math.abs(prod2) < eps);
-    }
 
     public static int numCrosses(Line line, Line[] lines) {
         int counter = 0;
         for (var l : lines) {
-            if (intersect(line, l)) counter += 1;
+            if (Line.intersect(line, l)) counter += 1;
         }
         return counter;
     }
