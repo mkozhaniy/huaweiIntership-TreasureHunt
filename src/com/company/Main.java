@@ -96,7 +96,7 @@ public class Main {
                 stP = ndP;
                 crossSt = crossNd;
             }
-            out.write("Number of doors = " + (mins + 1));
+            out.write("Number of doors = " + (mins));
             out.write("\n");
             pointsX0.clear();
             pointsX100.clear();

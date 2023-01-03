@@ -21,18 +21,17 @@ public class Line {
     }
 
     public static boolean intersect(Line p1, Line p2) {
-        double eps = 0.000001;
 
         double prod1 = product(p2, new Line(p1.x1, p1.y1, p2.x1, p2.y1));
         double prod2 = product(p2, new Line(p1.x2, p1.y2, p2.x1, p2.y1));
 
-        if (prod1 * prod2 > 0 || Math.abs(prod1) < eps || Math.abs(prod2) < eps)
+        if (prod1 * prod2 > 0)
             return false;
 
         prod1 = product(p1, new Line(p2.x1, p2.y1, p1.x1, p1.y1));
         prod2 = product(p1, new Line(p2.x2, p2.y2, p1.x1, p1.y1));
 
-        return !(prod1 * prod2 > 0 || Math.abs(prod1) < eps || Math.abs(prod2) < eps);
+        return !(prod1 * prod2 > 0);
     }
 
 }
